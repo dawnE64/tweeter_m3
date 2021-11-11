@@ -33,5 +33,3 @@ public class FollowService {
         return new FollowDAO();
     }
 }
-
-// Did the push work?
