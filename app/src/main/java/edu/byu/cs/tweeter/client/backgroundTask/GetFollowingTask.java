@@ -22,18 +22,8 @@ public class GetFollowingTask extends PagedTask<User> {
     private static final String LOG_TAG = "GetFollowingTask";
     static final String URL_PATH = "/getfollowing";
 
-    private ServerFacade serverFacade;
-
     public GetFollowingTask(Handler messageHandler, AuthToken authToken, User targetUser, int limit, User lastItem) {
         super(messageHandler, authToken, targetUser, limit, lastItem);
-    }
-
-    public ServerFacade getServerFacade() {
-        if( serverFacade == null ) {
-            serverFacade = new ServerFacade();
-        }
-
-        return serverFacade;
     }
 
     @Override
@@ -56,26 +46,17 @@ public class GetFollowingTask extends PagedTask<User> {
 
                 loadImages(response.getFollowees());
                 sendSuccessMessage();
+                return true;
             }
             else {
                 sendFailedMessage();
+                return false;
             }
         } catch (IOException | TweeterRemoteException ex) {
 //            Log.e(LOG_TAG, "Failed to get followees", ex);
             sendExceptionMessage(ex);
+            return false;
         }
-        return true;
-
-        /* MY OLD CODE
-        Pair<List<User>, Boolean> pageOfUsers = getFakeData().getPageOfUsers((User) lastItem, limit, targetUser);
-        this.items = pageOfUsers.getFirst();
-        this.hasMorePages = pageOfUsers.getSecond();
-
-        for (User u : this.items) {
-            BackgroundTaskUtils.loadImage(u);
-        }
-        return true;
-         */
     }
 
     // This method is public so it can be accessed by test cases

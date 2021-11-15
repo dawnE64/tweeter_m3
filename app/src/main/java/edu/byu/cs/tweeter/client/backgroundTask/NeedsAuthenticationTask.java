@@ -20,12 +20,12 @@ public abstract class NeedsAuthenticationTask extends BackgroundTask {
     /**
      * The user's username E.g., "@susan"
      */
-    private String alias;
+    protected String alias;
 
     /**
      * The user's password
      */
-    private String password;
+    protected String password;
 
     /**
      * The logged-in user returned by the server.

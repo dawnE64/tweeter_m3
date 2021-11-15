@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.client.util.ByteArrayUtils;
 import edu.byu.cs.tweeter.util.FakeData;
 
@@ -16,6 +17,8 @@ public abstract class BackgroundTask implements Runnable {
     public static final String SUCCESS_KEY = "success";
     public static final String MESSAGE_KEY = "message";
     public static final String EXCEPTION_KEY = "exception";
+
+    private ServerFacade serverFacade;
 
     /**
      * Message handler to be notified when task completes
@@ -89,6 +92,14 @@ public abstract class BackgroundTask implements Runnable {
      */
     protected void loadSuccessBundle(Bundle msgBundle) {
         return;
+    }
+
+    protected ServerFacade getServerFacade() {
+        if( serverFacade == null ) {
+            serverFacade = new ServerFacade();
+        }
+
+        return serverFacade;
     }
 
 }
