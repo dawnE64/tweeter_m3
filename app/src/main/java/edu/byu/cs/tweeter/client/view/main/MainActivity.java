@@ -1,78 +1,218 @@
 package edu.byu.cs.tweeter.client.view.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+
+import java.net.MalformedURLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import edu.byu.cs.tweeter.R;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.presenter.MainPresenter;
+import edu.byu.cs.tweeter.client.view.login.LoginActivity;
+import edu.byu.cs.tweeter.client.view.login.StatusDialogFragment;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
-import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+
+//import edu.byu.cs.tweeter.client.backgroundTask.GetFollowersCountTask;
+//import edu.byu.cs.tweeter.client.backgroundTask.GetFollowingCountTask;
 
 /**
  * The main activity for the application. Contains tabs for feed, story, following, and followers.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements StatusDialogFragment.Observer,
+        MainPresenter.View {
 
     private static final String LOG_TAG = "MainActivity";
 
     public static final String CURRENT_USER_KEY = "CurrentUser";
+
+    private Toast logOutToast;
+    private Toast postingToast;
+    private User selectedUser;
+    private TextView followeeCount;
+    private TextView followerCount;
+    private Button followButton;
+
+    private MainPresenter presenter;
+
+    @Override
+    public void logout() {
+        displayInfoMessage("Successfully logged out.");
+        //Revert to login screen.
+        Intent intent = new Intent(this, LoginActivity.class);
+        //Clear everything so that the main activity is recreated with the login page.
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //Clear user data (cached data).
+        Cache.getInstance().clearCache();
+        startActivity(intent);
+    }
+
+    @Override
+    public void updateFollowingandFollowersCount() {
+        updateSelectedUserFollowingAndFollowers();
+    }
+
+    @Override
+    public void setFollowerCount(String count) {
+        followerCount.setText(getString(R.string.followerCount, String.valueOf(count)));
+    }
+    @Override
+    public void setFollowingCount(String count) {
+        followeeCount.setText(getString(R.string.followeeCount, String.valueOf(count)));
+    }
+
+    /**
+     * Updates to removed or added!
+     * @param removed
+     */
+    @Override
+    public void updateFollowingButton(boolean removed) {
+        updateFollowButton(removed);
+    }
+
+    @Override
+    public void setFollowButtonClickable(boolean canClick) {
+        followButton.setEnabled(canClick);
+    }
+
+    @Override
+    public void setFollowButtonVisibility(boolean isVisible) {
+        if (isVisible) {
+            followButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            followButton.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void setIsFollowerButton(boolean isFollower) {
+        if (isFollower) {
+            followButton.setText(R.string.following);
+            followButton.setBackgroundColor(getResources().getColor(R.color.white));
+            followButton.setTextColor(getResources().getColor(R.color.lightGray));
+        } else {
+            followButton.setText(R.string.follow);
+            followButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        }
+    }
+
+    @Override
+    public void displayErrorMessage(String message) {
+        // FOR NOW. Might want to copy Login's more elegant error messages
+        clearInfoMessage();
+        clearErrorMessage();
+        logOutToast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
+        logOutToast.show();
+    }
+
+    @Override
+    public void clearErrorMessage() {
+        if (logOutToast != null) {
+            logOutToast.cancel();
+            logOutToast = null;
+        }
+    }
+
+    @Override
+    public void displayInfoMessage(String message) {
+        clearInfoMessage();
+        clearErrorMessage();
+        logOutToast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
+        logOutToast.show();
+    }
+
+    @Override
+    public void clearInfoMessage() {
+        if (logOutToast != null) {
+            logOutToast.cancel();
+            logOutToast = null;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        User user = (User) getIntent().getSerializableExtra(CURRENT_USER_KEY);
-        if(user == null) {
+        selectedUser = (User) getIntent().getSerializableExtra(CURRENT_USER_KEY);
+        if (selectedUser == null) {
             throw new RuntimeException("User not passed to activity");
         }
 
-        AuthToken authToken = Cache.getInstance().getCurrUserAuthToken();
+        presenter = new MainPresenter(this, Cache.getInstance().getCurrUserAuthToken(), selectedUser); // now following view has a presenter to work with
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), user, authToken);
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedUser);
         ViewPager viewPager = findViewById(R.id.view_pager);
+        viewPager.setOffscreenPageLimit(1);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
-        // We should use a Java 8 lambda function for the listener (and all other listeners), but
-        // they would be unfamiliar to many students who use this code.
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                StatusDialogFragment statusDialogFragment = new StatusDialogFragment();
+                statusDialogFragment.show(getSupportFragmentManager(), "post-status-dialog");
             }
         });
 
+        updateSelectedUserFollowingAndFollowers();
+
         TextView userName = findViewById(R.id.userName);
-        userName.setText(user.getName());
+        userName.setText(selectedUser.getName());
 
         TextView userAlias = findViewById(R.id.userAlias);
-        userAlias.setText(user.getAlias());
+        userAlias.setText(selectedUser.getAlias());
 
         ImageView userImageView = findViewById(R.id.userImage);
-        userImageView.setImageDrawable(ImageUtils.drawableFromByteArray(user.getImageBytes()));
+        userImageView.setImageDrawable(ImageUtils.drawableFromByteArray(selectedUser.getImageBytes()));
 
-        TextView followeeCount = findViewById(R.id.followeeCount);
-        followeeCount.setText(getString(R.string.followeeCount, 42));
+        followeeCount = findViewById(R.id.followeeCount);
+        followeeCount.setText(getString(R.string.followeeCount, "..."));
 
-        TextView followerCount = findViewById(R.id.followerCount);
-        followerCount.setText(getString(R.string.followerCount, 27));
+        followerCount = findViewById(R.id.followerCount);
+        followerCount.setText(getString(R.string.followerCount, "..."));
+
+        followButton = findViewById(R.id.followButton);
+
+        // At start check if follower and from there set visibility.
+        presenter.verifyIsFollower();
+
+        followButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                followButton.setEnabled(false);
+                boolean isNotAlreadyFollowing = followButton.getText().toString().
+                        equals(v.getContext().getString(R.string.following));
+                if (isNotAlreadyFollowing) {
+                    presenter.follow();
+                }
+                else {
+                    presenter.unfollow();
+                }
+            }
+        });
     }
 
     @Override
@@ -80,5 +220,46 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.logoutMenu) {
+            presenter.logout();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onStatusPosted(String post) throws ParseException, MalformedURLException {
+        presenter.postStatus(post, Cache.getInstance().getCurrUser(), getFormattedDateTime(),
+                presenter.parseURLs(post), presenter.parseMentions(post));
+    }
+
+    public String getFormattedDateTime() throws ParseException {
+        SimpleDateFormat userFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat statusFormat = new SimpleDateFormat("MMM d yyyy h:mm aaa");
+
+        return statusFormat.format(userFormat.parse(LocalDate.now().toString() + " " + LocalTime.now().toString().substring(0, 8)));
+    }
+
+    public void updateSelectedUserFollowingAndFollowers() {
+        presenter.countFollowersAndFollowing();
+//        presenter.countFollowers();
+//        presenter.countFollowing();
+    }
+
+    public void updateFollowButton(boolean removed) {
+        // If follow relationship was removed.
+        if (removed) {
+            followButton.setText(R.string.follow);
+            followButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        } else {
+            followButton.setText(R.string.following);
+            followButton.setBackgroundColor(getResources().getColor(R.color.white));
+            followButton.setTextColor(getResources().getColor(R.color.lightGray));
+        }
     }
 }
