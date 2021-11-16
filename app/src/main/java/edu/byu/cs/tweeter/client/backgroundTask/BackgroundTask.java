@@ -5,8 +5,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.List;
+
 import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.client.util.ByteArrayUtils;
+import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public abstract class BackgroundTask implements Runnable {
@@ -84,7 +89,7 @@ public abstract class BackgroundTask implements Runnable {
      * Abstract function to be overridden by children tasks
      * @return
      */
-    protected abstract boolean runTask();
+    protected abstract boolean runTask() throws IOException, TweeterRemoteException;
 
     /**
      * Not abstract so that class that don't need this can just return easily.
@@ -100,6 +105,13 @@ public abstract class BackgroundTask implements Runnable {
         }
 
         return serverFacade;
+    }
+
+    // This method is public so it can be accessed by test cases
+    public void loadImages(List<User> followees) throws IOException {
+        for (User u : followees) {
+            BackgroundTaskUtils.loadImage(u);
+        }
     }
 
 }

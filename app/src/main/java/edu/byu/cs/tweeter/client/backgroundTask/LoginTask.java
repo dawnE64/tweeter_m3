@@ -5,9 +5,7 @@ import android.os.Handler;
 import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
-import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
-import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 
 /**
@@ -23,26 +21,16 @@ public class LoginTask extends NeedsAuthenticationTask {
     }
 
     @Override
-    protected boolean runTask() {
+    protected boolean runTask() throws IOException, TweeterRemoteException {
         LoginRequest request = new LoginRequest(alias, password);
+        LoginResponse response = getServerFacade().login(request, URL_PATH);
 
-        try {
-            LoginResponse response = getServerFacade().login(request, URL_PATH);
-
-            if(response.isSuccess()) {
-                this.user = response.getUser();
-                this.authToken = response.getAuthToken();
-                BackgroundTaskUtils.loadImage(user);
-                sendSuccessMessage();
-                return true;
-            }
-            else {
-                sendFailedMessage();
-                return false;
-            }
-        } catch (IOException | TweeterRemoteException ex) {
-            sendExceptionMessage(ex);
-            return false;
+        if (response.isSuccess()) {
+            this.user = response.getUser();
+            this.authToken = response.getAuthToken();
+            BackgroundTaskUtils.loadImage(user);
         }
+
+        return response.isSuccess();
     }
 }

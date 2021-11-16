@@ -45,7 +45,7 @@ public class LoginPresenter implements SignInObserver {
             new UserService().login(alias,password, this); // THIS IS AN OBSERVER WTF?!
         }
         else {
-            view.displayErrorMessage("Login failed: " + message);
+            view.displayErrorMessage(message);
         }
     }
 

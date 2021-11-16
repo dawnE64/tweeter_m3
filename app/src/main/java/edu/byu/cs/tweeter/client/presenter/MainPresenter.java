@@ -53,12 +53,12 @@ PostObserver, CountObserver, IsFollowerObserver {
     // This responds to when ANY observer fails.
     @Override
     public void serviceFailure(String message) {
-        view.displayErrorMessage("Service failed: " + message); // todo: "Failed to post status: <ERROR MESSAGE> is that even possible to send? This was to eliminate duplicate code, but there's only one fail state...
+        view.displayErrorMessage(/*"Service failed: " + */message);
     }
 
     @Override
     public void serviceException(String message) {
-        view.displayErrorMessage("Service failed because of exception: " + message);
+        view.displayErrorMessage(/*"Service failed because of exception: " + */message);
     }
 
 

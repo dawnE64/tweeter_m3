@@ -27,43 +27,19 @@ public class GetFollowingTask extends PagedTask<User> {
     }
 
     @Override
-    protected boolean runTask() { // identical to getFollowersTask's, fix when implmnt server
-        String userAlias = targetUser.getAlias();
-
+    protected boolean runTask() throws IOException, TweeterRemoteException {
         String lastItemAlias = "";
-        if (lastItem != null) {
-            lastItemAlias = lastItem.getAlias();
+        if (lastItem != null) { lastItemAlias = lastItem.getAlias(); }
+
+        FollowingRequest request = new FollowingRequest(authToken, targetUser.getAlias(), limit, lastItemAlias);
+        FollowingResponse response = getServerFacade().getFollowees(request, URL_PATH);
+
+        if (response.isSuccess()) {
+            items = response.getFollowees();
+            hasMorePages = response.getHasMorePages();
+            loadImages(response.getFollowees());
         }
 
-        FollowingRequest request = new FollowingRequest(authToken, userAlias, limit, lastItemAlias);
-
-        try {
-            FollowingResponse response = getServerFacade().getFollowees(request, URL_PATH);
-
-            if(response.isSuccess()) {
-                items = response.getFollowees();
-                hasMorePages = response.getHasMorePages();
-
-                loadImages(response.getFollowees());
-                sendSuccessMessage();
-                return true;
-            }
-            else {
-                sendFailedMessage();
-                return false;
-            }
-        } catch (IOException | TweeterRemoteException ex) {
-//            Log.e(LOG_TAG, "Failed to get followees", ex);
-            sendExceptionMessage(ex);
-            return false;
-        }
+        return response.isSuccess();
     }
-
-    // This method is public so it can be accessed by test cases
-    public void loadImages(List<User> followees) throws IOException {
-        for (User u : followees) {
-            BackgroundTaskUtils.loadImage(u);
-        }
-    }
-
 }

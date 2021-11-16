@@ -57,7 +57,7 @@ public class RegisterPresenter implements SignInObserver {
                     imageBytesBase64,this);
         }
         else {
-            view.displayErrorMessage("Register failed: " + message);
+            view.displayErrorMessage(message);
         }
     }
 
