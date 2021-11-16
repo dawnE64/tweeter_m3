@@ -16,13 +16,13 @@ public class IsFollowerTask extends AlreadyAuthenticatedTask {
     public static final String IS_FOLLOWER_KEY = "is-follower";
     private boolean isFollower;
 
-    private User follower;
-    private User followee;
+    private User targetUser;
+    private User potentialFollower;
 
-    public IsFollowerTask(Handler messageHandler, AuthToken authToken, User follower, User followee) {
+    public IsFollowerTask(Handler messageHandler, AuthToken authToken, User targetUser, User potentialFollower) {
         super(messageHandler, authToken);
-        this.follower = follower;
-        this.followee = followee;
+        this.targetUser = targetUser;
+        this.potentialFollower = potentialFollower;
     }
 
     @Override

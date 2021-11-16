@@ -138,8 +138,8 @@ PostObserver, CountObserver, IsFollowerObserver {
         }
         else {
             view.setFollowButtonVisibility(true);
-            User follower = new User();
-            followService.isFollower(authToken, targetUser, follower,this);
+            User potentialFollower = new User();
+            followService.isFollower(authToken, targetUser, potentialFollower,this);
         }
     }
 
