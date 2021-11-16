@@ -2,30 +2,48 @@ package edu.byu.cs.tweeter.server.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetCountRequest;
+import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
+import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
+import edu.byu.cs.tweeter.model.net.response.GetCountResponse;
+import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
+import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.util.FakeData;
+import edu.byu.cs.tweeter.server.util.Pair;
 
 /**
  * A DAO for accessing 'following' data from the database.
  */
 public class FollowDAO {
 
-    /**
-     * Gets the count of users from the database that the user specified is following. The
-     * current implementation uses generated data and doesn't actually access a database.
-     *
-     * @param follower the User whose count of how many following is desired.
-     * @return said count.
-     */
-    public Integer getFolloweeCount(User follower) {
+    public GetCountResponse getCounts(GetCountRequest request) {
         // TODO: uses the dummy data.  Replace with a real implementation.
-        assert follower != null;
-        return getDummyFollowees().size();
+        assert request != null;
+        return new GetCountResponse(getDummyFollowees().size(), getDummyFollowees().size());
+    }
+
+    public FollowResponse follow(FollowRequest request) {
+        // TODO: Make this do real stuff. M4
+        return new FollowResponse(true);
+    }
+
+    public UnfollowResponse unfollow(UnfollowRequest request) {
+        // TODO: Make this do real stuff. M4
+        return new UnfollowResponse(true);
+    }
+
+    public IsFollowerResponse isFollower(IsFollowerRequest request) {
+        // TODO: Make this do real stuff. M4
+        return new IsFollowerResponse((new Random().nextInt() > 0));
     }
 
     /**

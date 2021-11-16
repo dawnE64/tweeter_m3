@@ -1,9 +1,19 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.Random;
+
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetCountRequest;
+import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
+import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
+import edu.byu.cs.tweeter.model.net.response.GetCountResponse;
+import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
+import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
 
 /**
@@ -26,6 +36,22 @@ public class FollowService {
 
     public FollowersResponse getFollowers(FollowersRequest request) {
         return getFollowDAO().getFollowers(request);
+    }
+
+    public GetCountResponse getCounts(GetCountRequest request) {
+        return getFollowDAO().getCounts(request);
+    }
+
+    public FollowResponse follow(FollowRequest request) {
+        return getFollowDAO().follow(request);
+    }
+
+    public UnfollowResponse unfollow(UnfollowRequest request) {
+        return getFollowDAO().unfollow(request);
+    }
+
+    public IsFollowerResponse isFollower(IsFollowerRequest request) {
+        return getFollowDAO().isFollower(request);
     }
 
     /**
