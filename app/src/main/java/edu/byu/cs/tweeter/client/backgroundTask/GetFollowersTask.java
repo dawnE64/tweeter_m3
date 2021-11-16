@@ -2,10 +2,16 @@ package edu.byu.cs.tweeter.client.backgroundTask;
 
 import android.os.Handler;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.util.Pair;
 
 /**
@@ -13,21 +19,27 @@ import edu.byu.cs.tweeter.util.Pair;
  */
 public class GetFollowersTask extends PagedTask<User> {
     private static final String LOG_TAG = "GetFollowersTask";
+    static final String URL_PATH = "/getfollowers";
 
     public GetFollowersTask(Handler messageHandler, AuthToken authToken, User targetUser, int limit, User lastItem) {
         super(messageHandler, authToken, targetUser, limit, lastItem);
     }
 
     @Override
-    protected boolean runTask() {
-        Pair<List<User>, Boolean> pageOfUsers = getFakeData().getPageOfUsers((User) lastItem, limit, targetUser);
-        this.items = pageOfUsers.getFirst();
-        this.hasMorePages = pageOfUsers.getSecond();
+    protected boolean runTask() throws IOException, TweeterRemoteException {
+        String lastItemAlias = "";
+        if (lastItem != null) { lastItemAlias = lastItem.getAlias(); }
 
-        for (User u : this.items) {
-            BackgroundTaskUtils.loadImage(u);
+        FollowersRequest request = new FollowersRequest(authToken, targetUser.getAlias(), limit, lastItemAlias);
+        FollowersResponse response = getServerFacade().getFollowers(request, URL_PATH);
+
+        if (response.isSuccess()) {
+            items = response.getFollowers();
+            hasMorePages = response.getHasMorePages();
+            loadImages(response.getFollowers());
         }
-        return true;
+
+        return response.isSuccess();
     }
 
 }
