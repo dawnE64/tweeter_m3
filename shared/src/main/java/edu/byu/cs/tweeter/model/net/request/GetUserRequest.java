@@ -5,11 +5,11 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public class GetUserRequest {
     private AuthToken authToken;
-    private User targetUser;
+    private String targetUser;
 
     private GetUserRequest() {}
 
-    public GetUserRequest(AuthToken authToken, User targetUser) {
+    public GetUserRequest(AuthToken authToken, String targetUser) {
         this.authToken = authToken;
         this.targetUser = targetUser;
     }
@@ -22,11 +22,11 @@ public class GetUserRequest {
         this.authToken = authToken;
     }
 
-    public User getTargetUser() {
+    public String getTargetUser() {
         return targetUser;
     }
 
-    public void setTargetUser(User targetUser) {
+    public void setTargetUser(String targetUser) {
         this.targetUser = targetUser;
     }
 

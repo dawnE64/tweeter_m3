@@ -37,7 +37,7 @@ public class UserService {
 
     public GetUserResponse getUser(GetUserRequest request) {
         // TODO: Generates dummy data. Replace with a real implementation.
-        User user = getFakeData().findUserByAlias(request.getTargetUser().getAlias());
+        User user = getFakeData().findUserByAlias(request.getTargetUser());
         return new GetUserResponse(user);
     }
 

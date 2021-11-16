@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.client.util.ByteArrayUtils;
+import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.util.FakeData;
@@ -108,9 +109,20 @@ public abstract class BackgroundTask implements Runnable {
     }
 
     // This method is public so it can be accessed by test cases
-    public void loadImages(List<User> followees) throws IOException {
+    public void loadImage(User user) throws IOException {
+        BackgroundTaskUtils.loadImage(user);
+    }
+
+    // This method is public so it can be accessed by test cases
+    public void loadImagesForUsers(List<User> followees) throws IOException {
         for (User u : followees) {
             BackgroundTaskUtils.loadImage(u);
+        }
+    }
+
+    public void loadImagesForStatuses(List<Status> items) {
+        for (Status s : items) {
+            BackgroundTaskUtils.loadImage(s.getUser());
         }
     }
 

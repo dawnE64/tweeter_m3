@@ -43,7 +43,8 @@ public class FollowDAO {
 
     public IsFollowerResponse isFollower(IsFollowerRequest request) {
         // TODO: Make this do real stuff. M4
-        return new IsFollowerResponse((new Random().nextInt() > 0));
+        boolean random = (new Random().nextInt() > 0);
+        return new IsFollowerResponse(random);
     }
 
     /**
