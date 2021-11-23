@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.backgroundTask.BackgroundTask;
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 
 public abstract class BaseService {
 
@@ -15,4 +16,7 @@ public abstract class BaseService {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(taskToExecute);
     }
+
+
+
 }

@@ -93,7 +93,7 @@ public class MainPresenterUnitTest {
 
         // Report
         Mockito.verify(mockView).displayInfoMessage("Logging Out...");
-        Mockito.verify(mockView).displayErrorMessage("Service failed: Failed");
+        Mockito.verify(mockView).displayErrorMessage("Failed");
         Mockito.verify(mockCache, Mockito.times(0)).clearCache();
         Mockito.verify(mockView, Mockito.times(0)).logout();
     }
@@ -119,7 +119,7 @@ public class MainPresenterUnitTest {
 
         // Report
         Mockito.verify(mockView).displayInfoMessage("Logging Out...");
-        Mockito.verify(mockView).displayErrorMessage("Service failed because of exception: Exception");
+        Mockito.verify(mockView).displayErrorMessage("Exception");
         Mockito.verify(mockCache, Mockito.times(0)).clearCache();
         Mockito.verify(mockView, Mockito.times(0)).logout();
     }
@@ -194,7 +194,7 @@ public class MainPresenterUnitTest {
         mainPresenterSpy.postStatus(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
         // Report
-        Mockito.verify(mockView).displayErrorMessage("Service failed: <ERROR MESSAGE>");
+        Mockito.verify(mockView).displayErrorMessage("<ERROR MESSAGE>");
         Mockito.verify(mockView, Mockito.times(0)).displayInfoMessage("Successfully Posted!");
     }
 
@@ -216,7 +216,7 @@ public class MainPresenterUnitTest {
         mainPresenterSpy.postStatus(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
         // Report
-        Mockito.verify(mockView).displayErrorMessage("Service failed because of exception: <EXCEPTION MESSAGE>");
+        Mockito.verify(mockView).displayErrorMessage("<EXCEPTION MESSAGE>");
         Mockito.verify(mockView, Mockito.times(0)).displayInfoMessage("Successfully Posted!");
     }
 }

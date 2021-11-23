@@ -108,6 +108,10 @@ public abstract class BackgroundTask implements Runnable {
         return serverFacade;
     }
 
+    public void setServerFacade(ServerFacade serverFacade) {
+        this.serverFacade = serverFacade;
+    }
+
     // This method is public so it can be accessed by test cases
     public void loadImage(User user) throws IOException {
         BackgroundTaskUtils.loadImage(user);

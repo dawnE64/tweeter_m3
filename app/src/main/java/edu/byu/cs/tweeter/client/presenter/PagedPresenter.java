@@ -38,6 +38,7 @@ public abstract class PagedPresenter<T> extends BasePresenter implements GetUser
 
         view.setLoading(false);
         isLoading = false;
+
         view.addItems(items);
     }
 
@@ -67,4 +68,5 @@ public abstract class PagedPresenter<T> extends BasePresenter implements GetUser
         isLoading = false;
         view.setLoading(false);
     }
+
 }

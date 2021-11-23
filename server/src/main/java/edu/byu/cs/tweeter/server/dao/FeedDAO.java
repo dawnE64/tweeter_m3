@@ -13,6 +13,7 @@ public class FeedDAO {
     public GetFeedResponse getFeed(GetFeedRequest request) {
         Pair<List<Status>, Boolean> pageOfStatus = getFakeData().getPageOfStatus(request.getLastItem(), request.getLimit());
         // fixme: if errors crop up make sure its not because this should be in the shared folder?
+        // fixme: DAO should not take in requests and return responses. They should only do simple database operations.
 
         return new GetFeedResponse(pageOfStatus.getFirst(), pageOfStatus.getSecond());
     }
